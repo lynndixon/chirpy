@@ -85,3 +85,35 @@ func TestWrongSecretJWT(t *testing.T) {
 		t.Fatal("expected ValidateJWT to return an error for wrong secret")
 	}
 }
+
+func TestGetBearerToken(t *testing.T) {
+	headers := make(map[string][]string)
+	headers["Authorization"] = []string{"Bearer my-jwt-token"}
+
+	token, err := GetBearerToken(headers)
+	if err != nil {
+		t.Fatalf("GetBearerToken returned an error: %v", err)
+	}
+	if token != "my-jwt-token" {
+		t.Errorf("expected token 'my-jwt-token', got '%s'", token)
+	}
+}
+
+func TestGetBearerTokenMissing(t *testing.T) {
+	headers := make(map[string][]string)
+
+	_, err := GetBearerToken(headers)
+	if err == nil {
+		t.Fatal("expected GetBearerToken to return an error for missing header")
+	}
+}
+
+func TestGetBearerTokenInvalidFormat(t *testing.T) {
+	headers := make(map[string][]string)
+	headers["Authorization"] = []string{"InvalidFormat"}
+
+	_, err := GetBearerToken(headers)
+	if err == nil {
+		t.Fatal("expected GetBearerToken to return an error for invalid format")
+	}
+}
